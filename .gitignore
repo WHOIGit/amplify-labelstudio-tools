@@ -1,0 +1,7 @@
+ls_config.*.json
+s3_config.*.json
+.idea
+__pycache__
+venv
+.env
+src/labelstudio-tools/
