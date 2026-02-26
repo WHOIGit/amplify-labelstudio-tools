@@ -1,0 +1,243 @@
+{
+  "id": 40540,
+  "data": {
+    "frame": 552,
+    "image": "https://amplify-labelstudio.whoi.edu/tasks/40540/resolve/?fileuri=czM6Ly9hbXBsaWZ5L2xhYmVsc3R1ZGlvL2lzaWlzL2ZyYW1lc19qcGcvT1RaX0FSNDNfMTJNYXIyMDIwXzAwMS9PVFpfQVI0M18xMk1hcjIwMjBfMDAxX18wMDA1NTIuanBn",
+    "media": "OTZ_AR43_12Mar2020_001",
+    "cruise": "AR43",
+    "media_fps": 15
+  },
+  "annotations": [
+    {
+      "id": 23244,
+      "result": [
+        {
+          "id": "UVLhg3BKQa",
+          "type": "rectangle",
+          "value": {
+            "x": 2.15554571873977,
+            "y": 2.0627802690582944,
+            "width": 53.41711734252008,
+            "height": 51.74887892376682,
+            "rotation": 0
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "roi",
+          "image_rotation": 0,
+          "original_width": 2330,
+          "original_height": 1750
+        },
+        {
+          "id": "UVLhg3BKQa",
+          "type": "taxonomy",
+          "value": {
+            "x": 2.15554571873977,
+            "y": 2.0627802690582944,
+            "width": 53.41711734252008,
+            "height": 51.74887892376682,
+            "rotation": 0,
+            "taxonomy": [
+              [
+                "chordate",
+                "appendicularian",
+                "appendicularian_house"
+              ]
+            ]
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "roi_class",
+          "image_rotation": 0,
+          "original_width": 2330,
+          "original_height": 1750
+        },
+        {
+          "id": "UVLhg3BKQa",
+          "type": "choices",
+          "value": {
+            "x": 2.15554571873977,
+            "y": 2.0627802690582944,
+            "width": 53.41711734252008,
+            "height": 51.74887892376682,
+            "choices": [
+              "roi-verified",
+              "roi-checkme"
+            ],
+            "rotation": 0
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "roi_booleans",
+          "image_rotation": 0,
+          "original_width": 2330,
+          "original_height": 1750
+        },
+        {
+          "id": "UVLhg3BKQa",
+          "type": "textarea",
+          "value": {
+            "x": 2.15554571873977,
+            "y": 2.0627802690582944,
+            "text": [
+              "ROI-NOTE WOW"
+            ],
+            "width": 53.41711734252008,
+            "height": 51.74887892376682,
+            "rotation": 0
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "roi_note",
+          "image_rotation": 0,
+          "original_width": 2330,
+          "original_height": 1750
+        },
+        {
+          "id": "ua359Hf4Pf",
+          "type": "choices",
+          "value": {
+            "choices": [
+              "training"
+            ]
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "frame_dataset"
+        },
+        {
+          "id": "ybinGZ4i_x",
+          "type": "choices",
+          "value": {
+            "choices": [
+              "frame-verified",
+              "frame-checkme"
+            ]
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "frame_booleans"
+        },
+        {
+          "id": "nh9IfBB6kS",
+          "type": "rectangle",
+          "value": {
+            "x": 3.2333185781096634,
+            "y": 58.38565022421525,
+            "width": 51.261571623780284,
+            "height": 36.053811659192824,
+            "rotation": 0
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "roi",
+          "image_rotation": 0,
+          "original_width": 2330,
+          "original_height": 1750
+        },
+        {
+          "id": "nh9IfBB6kS",
+          "type": "taxonomy",
+          "value": {
+            "x": 3.2333185781096634,
+            "y": 58.38565022421525,
+            "width": 51.261571623780284,
+            "height": 36.053811659192824,
+            "rotation": 0,
+            "taxonomy": [
+              [
+                "mollusca",
+                "pteropod"
+              ]
+            ]
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "roi_class",
+          "image_rotation": 0,
+          "original_width": 2330,
+          "original_height": 1750
+        },
+        {
+          "id": "nh9IfBB6kS",
+          "type": "choices",
+          "value": {
+            "x": 3.2333185781096634,
+            "y": 58.38565022421525,
+            "width": 51.261571623780284,
+            "height": 36.053811659192824,
+            "choices": [
+              "roi-verified",
+              "roi-checkme"
+            ],
+            "rotation": 0
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "roi_booleans",
+          "image_rotation": 0,
+          "original_width": 2330,
+          "original_height": 1750
+        },
+        {
+          "id": "nh9IfBB6kS",
+          "type": "textarea",
+          "value": {
+            "x": 3.2333185781096634,
+            "y": 58.38565022421525,
+            "text": [
+              "ROI NOTE NUMBER 2"
+            ],
+            "width": 51.261571623780284,
+            "height": 36.053811659192824,
+            "rotation": 0
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "roi_note",
+          "image_rotation": 0,
+          "original_width": 2330,
+          "original_height": 1750
+        },
+        {
+          "id": "AaRK74gf1k",
+          "type": "textarea",
+          "value": {
+            "text": [
+              "FRAME-NOTE"
+            ]
+          },
+          "origin": "manual",
+          "to_name": "image",
+          "from_name": "frame_note"
+        }
+      ],
+      "created_username": "Sidney sbatchelder@whoi.edu, 1",
+      "created_ago": "0 minutes",
+      "completed_by": {
+        "id": 1,
+        "first_name": "Sidney",
+        "last_name": "",
+        "avatar": null,
+        "email": "sbatchelder@whoi.edu",
+        "initials": "S"
+      },
+      "was_cancelled": false,
+      "ground_truth": false,
+      "created_at": "2026-02-18T21:35:33.002010Z",
+      "updated_at": "2026-02-18T21:35:33.002029Z",
+      "draft_created_at": "2026-02-18T21:12:19.401589Z",
+      "lead_time": 148.894,
+      "import_id": null,
+      "last_action": null,
+      "bulk_created": false,
+      "task": 40540,
+      "project": 1,
+      "updated_by": 1,
+      "parent_prediction": null,
+      "parent_annotation": null,
+      "last_created_by": null
+    }
+  ],
+  "predictions": []
+}

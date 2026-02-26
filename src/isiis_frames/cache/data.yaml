@@ -1,0 +1,22 @@
+train:
+ - /proj/omics/sosik/yolozone/training_data_v3_20251113/train/images
+val:
+ - /proj/omics/sosik/yolozone/training_data_v3_20251113/val/images
+nc: 16
+names:
+  0: amphipod
+  1: appendicularian
+  2: chaetognath
+  3: copepod
+  4: ctenophore
+  5: doliolid
+  6: euphausid
+  7: fish
+  8: medusa
+  9: polychaete
+  10: pteropod
+  11: radiolarian
+  12: salp
+  13: siphonophore
+  14: trichodesmium
+  15: veliger

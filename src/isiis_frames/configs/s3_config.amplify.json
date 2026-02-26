@@ -1,0 +1,7 @@
+{
+  "bucket": "amplify",
+  "endpoint_url": "http://vast.whoi.edu",
+  "aws_access_key_id": "N7A3WRCAR65YMGF1TEXX",
+  "aws_secret_access_key": ...,
+  "config": {"max_pool_connections": 100}
+}

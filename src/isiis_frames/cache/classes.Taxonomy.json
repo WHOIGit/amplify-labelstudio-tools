@@ -1,0 +1,122 @@
+{
+  "items": [
+    { "value": "arthropod",
+      "children": [
+        { "value": "amphipod" },
+        { "value": "copepod",
+          "children": [
+            { "value": "copepod_euph_missclass" },
+            { "value": "copepod_small" },
+            { "value": "mf_amphipod" }
+          ]
+        },
+        { "value": "decapod" },
+        { "value": "euphasid_ambiguous" },
+        { "value": "euphausid" },
+        { "value": "stomatopod" }
+      ]
+    },
+    { "value": "artifact",
+      "children": [
+        { "value": "center_spot_line" }
+      ]
+    },
+    { "value": "chordate",
+      "children": [
+        { "value": "appendicularian",
+          "children": [
+            { "value": "appendicularian_house" }
+          ]
+        },
+        { "value": "doliolid" },
+        { "value": "fish" },
+        { "value": "salp",
+          "children": [
+            { "value": "salpa_aspera" },
+            { "value": "salp_broken_chain" },
+            { "value": "salp_chain" },
+            { "value": "salp_solitary" }
+          ]
+        }
+      ]
+    },
+    { "value": "cnidaria",
+      "children": [
+        { "value": "medusa",
+          "children": [
+            { "value": "medusa_aegina" },
+            { "value": "medusa_skinny_star_squiggly" },
+            { "value": "medusa_solmaris" }
+          ]
+        },
+        { "value": "siphonophore",
+          "children": [
+            { "value": "physonect" },
+            { "value": "siphonophore_bract" },
+            { "value": "siphonophore_diphyid" },
+            { "value": "siphonophore_lilyopsis" },
+            { "value": "siphonophore_sphaeronectes" }
+          ]
+        }
+      ]
+    },
+    { "value": "ctenophore",
+      "children": [
+        { "value": "beroe" },
+        { "value": "cestid" },
+        { "value": "cydippid" },
+        { "value": "lobate" }
+      ]
+    },
+    { "value": "cyanobacteriota",
+      "children": [
+        { "value": "trichodesmium" }
+      ]
+    },
+    { "value": "fecal_pellet",
+      "children": [
+        { "value": "fecal_pellet_blob" },
+        { "value": "fecal_pellet_long" }
+      ]
+    },
+    { "value": "mollusca",
+      "children": [
+        { "value": "pteropod" },
+        { "value": "veliger" }
+      ]
+    },
+    { "value": "other",
+      "children": [
+        { "value": "detritus" },
+        { "value": "marine_snow" },
+        { "value": "tentacles" }
+      ]
+    },
+    { "value": "protozoa",
+      "children": [
+        { "value": "diatom_chain" },
+        { "value": "foraminifera_calcarina" },
+        { "value": "radiolarian",
+          "children": [
+            { "value": "acantharia_bushy_star" },
+            { "value": "acantharian_skinny_star_straight" },
+            { "value": "radiolarian_colony" }
+          ]
+        }
+      ]
+    },
+    { "value": "save"
+    },
+    { "value": "worm",
+      "children": [
+        { "value": "chaetognath" },
+        { "value": "polychaete",
+          "children": [
+            { "value": "polychaete_tomopteris" },
+            { "value": "polychaete_type2" }
+          ]
+        }
+      ]
+    }
+  ]
+}

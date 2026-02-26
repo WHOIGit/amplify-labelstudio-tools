@@ -1,0 +1,13 @@
+{
+  "host": "https://amplify-labelstudio.whoi.edu",
+  "token": ...,
+  "project": 1,
+  "pk": "image",
+  "s3_config": {
+    "bucket": "amplify",
+    "endpoint_url": "http://vast.whoi.edu",
+    "aws_access_key_id": "N7A3WRCAR65YMGF1TEXX",
+    "aws_secret_access_key": ...,
+    "prefix": "labelstudio/isiis/"
+  }
+}
