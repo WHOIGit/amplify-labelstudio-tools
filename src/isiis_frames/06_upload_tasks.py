@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 from label_studio_sdk.client import LabelStudio
 
-from core import LabelStudioPlus
+from labelstudio_tools import LabelStudioPlus
 
 TASKSCACHE = 'cache/tasks.pkl'
 FAILEDCACHE = 'cache/from_results_csv__missing_in_mediamap.json'

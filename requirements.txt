@@ -1,1 +1,2 @@
 git+https://github.com/WHOIGit/labelstudio-tools.git
+tator ~= 1.4.20
