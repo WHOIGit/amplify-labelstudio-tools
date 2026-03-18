@@ -29,6 +29,13 @@ class BBox:
         x, y, w, h = 100*x, 100*y, 100*width, 100*height
         return cls(x,y,w,h)
 
+    def to_dict(self):
+        return {'x': self.x, 'y': self.y, 'width': self.width, 'height': self.height}
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(d['x'], d['y'], d['width'], d['height'])
+
 
 
 class IsiisRoi:
@@ -107,6 +114,31 @@ class IsiisRoi:
 
         # these results extend the other results for the task annotation/prediction being submitted
         return output
+
+    def to_dict(self):
+        return {
+            'xywh': self.xywh.to_dict(),
+            'class_taxonpath': self.class_taxonpath,
+            'verified': self.verified,
+            'checkme': self.checkme,
+            'note': self.note,
+            'score': self.score,
+            'original_width': self.original_width,
+            'original_height': self.original_height,
+        }
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(
+            xywh=BBox.from_dict(d['xywh']),
+            class_taxonpath=d['class_taxonpath'],
+            verified=d.get('verified', False),
+            checkme=d.get('checkme', False),
+            note=d.get('note'),
+            score=d.get('score'),
+            original_width=d.get('original_width'),
+            original_height=d.get('original_height'),
+        )
 
 
 class IsiisAnnotation:
@@ -205,12 +237,41 @@ class IsiisAnnotation:
                 output['score'] = score
             if self.model_version is not None:
                 output['model_version'] = self.model_version
-                assert score is not None, 'model_version provided without score'
+                #assert score is not None, 'model_version provided without score' # wont work with empty frame annotations
 
         if task_id is not None:
             output['task_id'] = task_id
 
         return output
+
+    def to_dict(self):
+        return {
+            'training': self.training,
+            'holdout': self.holdout,
+            'verified': self.verified,
+            'checkme': self.checkme,
+            'note': self.note,
+            'rois': [r.to_dict() for r in self.rois],
+            'score': self.score,
+            'model_version': self.model_version,
+            'original_width': self.original_width,
+            'original_height': self.original_height,
+        }
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(
+            training=d.get('training', False),
+            holdout=d.get('holdout', False),
+            verified=d.get('verified', False),
+            checkme=d.get('checkme', False),
+            note=d.get('note'),
+            rois=[IsiisRoi.from_dict(r) for r in d.get('rois', [])],
+            score=d.get('score'),
+            model_version=d.get('model_version'),
+            original_width=d.get('original_width'),
+            original_height=d.get('original_height'),
+        )
 
 
 class IsiisTask:
@@ -223,6 +284,27 @@ class IsiisTask:
         self.image = image
         self.annotations:list[IsiisAnnotation] = annotations or []
         # note that annotations with scores are considered predictions
+
+    def to_dict(self):
+        return {
+            'cruise': self.cruise,
+            'media': self.media,
+            'media_fps': self.media_fps,
+            'frame': self.frame,
+            'image': self.image,
+            'annotations': [a.to_dict() for a in self.annotations],
+        }
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(
+            cruise=d['cruise'],
+            media=d['media'],
+            media_fps=d['media_fps'],
+            frame=d['frame'],
+            image=d['image'],
+            annotations=[IsiisAnnotation.from_dict(a) for a in d.get('annotations', [])],
+        )
 
     def as_new_taskdata_dict(self, predictions_key=None, annotations_key=None):
         task_data = dict(

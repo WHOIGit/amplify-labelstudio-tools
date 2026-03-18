@@ -50,7 +50,7 @@ def row_to_roi(row):
     return roi
 
 
-def parse_results_csv(media_map, results_csv):
+def parse_results_csv(media_map, results_csv, include_all_media_frames=False):
     import csv
 
     name_to_id = {m['name']: media_id for media_id, m in media_map.items()}
@@ -97,35 +97,95 @@ def parse_results_csv(media_map, results_csv):
             tasks[(media_id,int(frame_number))].annotations[0].rois.append(roi)
 
 
-    # TODO test this
-    tasks = {key:task for key,task in tasks.items() if task.annotations}
+    if include_all_media_frames:
+        for task in tasks.values():
+            if not task.annotations:
+                task.annotations.append(IsiisAnnotation(model_version='train7'))
+    else:
+        tasks = {key:task for key,task in tasks.items() if task.annotations}
 
     return tasks, from_results_csv__missing_in_mediamap
 
 
 
 if __name__ == '__main__':
-    TASKSCACHE = 'cache/tasks.pkl'
+    import os
+    from collections import defaultdict
+
+    TASKSCACHEDIR = 'cache/tasks'
     FAILEDCACHE = 'cache/from_results_csv__missing_in_mediamap.json'
-    if os.path.isfile(TASKSCACHE):
-        with open(TASKSCACHE,'rb') as f:
-            tasks = pickle.load(f)
-        if os.path.isfile(FAILEDCACHE):
-            with open(FAILEDCACHE) as f:
-                from_results_csv__missing_in_mediamap = json.load(f)
+
+    existing_jsonl = [f for f in os.listdir(TASKSCACHEDIR) if f.endswith('_tasks.jsonl')] if os.path.isdir(TASKSCACHEDIR) else []
+
+    if existing_jsonl:
+        print(f'cache exists ({len(existing_jsonl)} media files in {TASKSCACHEDIR}/), skipping rebuild')
     else:
         results_csv = 'cache/AR88_yolo_concatenated_results.csv'
 
         with open('cache/tator_media_map.pkl', 'rb') as f:
             media_map = pickle.load(f)
 
-        tasks, from_results_csv__missing_in_mediamap = parse_results_csv(media_map, results_csv)
-        print(tasks[list(tasks.keys())[0]].__dict__)
-        print(len(from_results_csv__missing_in_mediamap))
-        with open(TASKSCACHE,'wb') as f:
-            pickle.dump(tasks,f)
+        tasks, from_results_csv__missing_in_mediamap = parse_results_csv(media_map, results_csv, include_all_media_frames=True)
+        print(f'built {len(tasks)} tasks across {len({t.media for t in tasks.values()})} media')
+        print(f'missing: {len(from_results_csv__missing_in_mediamap)}')
+
         with open(FAILEDCACHE, 'w') as f:
-            json.dump(sorted(from_results_csv__missing_in_mediamap), f)
+            json.dump(sorted(from_results_csv__missing_in_mediamap, key=lambda t: (t[0], t[2], t[1] is None, t[1] or 0)), f)
+
+        # Group tasks by media
+        media_tasks = defaultdict(list)
+        for task in tasks.values():
+            media_tasks[task.media].append(task)
+
+        os.makedirs(TASKSCACHEDIR, exist_ok=True)
+
+        summary = {}
+        agg = {'frames_with_rois': 0, 'frames_without_rois': 0, 'total_rois': 0}
+        skipped_media = []
+
+        SKIP_EMPTY_MEDIA = True  # set False to write JSONL even for media with no ROIs
+
+        for media_name, task_list in tqdm(sorted(media_tasks.items()), desc='writing task files'):
+            task_list.sort(key=lambda t: t.frame)
+
+            with_rois = 0
+            without_rois = 0
+            roi_count = 0
+
+            for task in task_list:
+                n_rois = sum(len(a.rois) for a in task.annotations)
+                if n_rois > 0:
+                    with_rois += 1
+                else:
+                    without_rois += 1
+                roi_count += n_rois
+
+            if SKIP_EMPTY_MEDIA and roi_count == 0:
+                skipped_media.append(media_name)
+                continue
+
+            filepath = os.path.join(TASKSCACHEDIR, f'{media_name}_tasks.jsonl')
+            with open(filepath, 'w') as f:
+                for task in task_list:
+                    f.write(json.dumps(task.to_dict()) + '\n')
+
+            summary[media_name] = {
+                'frames_with_rois': with_rois,
+                'frames_without_rois': without_rois,
+                'total_rois': roi_count,
+                'total_frames': with_rois + without_rois,
+            }
+            agg['frames_with_rois'] += with_rois
+            agg['frames_without_rois'] += without_rois
+            agg['total_rois'] += roi_count
+
+        agg['total_frames'] = agg['frames_with_rois'] + agg['frames_without_rois']
+        summary['_aggregate'] = agg
+        summary['_skipped_empty_media'] = skipped_media
+
+        with open(os.path.join(TASKSCACHEDIR, 'summary.json'), 'w') as f:
+            json.dump(summary, f, indent=2)
+        print(f"aggregate: {agg}")
 
 
 # todo next steps

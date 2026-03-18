@@ -1,5 +1,6 @@
 import json
 import pickle
+import math
 import tator
 from tqdm import tqdm
 from time import sleep
@@ -11,8 +12,8 @@ def collate_version(media_map, tator_api, TATOR_PROJECT_ID, version_id):
     chunk = 500
     locs_total = tator_api.get_localization_count(TATOR_PROJECT_ID, version=[version_id])
     print()
-    for start in tqdm(range(0, locs_total, chunk), total=int(locs_total / chunk), desc=f'locs (v={version_id})'):
-        locs.extend(tator_api.get_localization_list(TATOR_PROJECT_ID, start=start, stop=start + chunk))
+    for start in tqdm(range(0, locs_total, chunk), total=math.ceil(locs_total / chunk), desc=f'locs (v={version_id})'):
+        locs.extend(tator_api.get_localization_list(TATOR_PROJECT_ID, version=[version_id], start=start, stop=start + chunk))
     #locs = tator_api.get_localization_list(TATOR_PROJECT_ID, version=[version_id])
 
     locs = sorted(locs, key=lambda loc: (loc.media, loc.frame, loc.x, loc.y))
@@ -39,8 +40,8 @@ def collate_version(media_map, tator_api, TATOR_PROJECT_ID, version_id):
             frame_info = media_info['frames'][frame_number]
         else:
             frame_info = media_entry['frames'][state.frame].copy()
-            frame_info.pop('tator_media_id')
-            frame_info.pop('tator_frame')
+            frame_info.pop('tator_media_id', None)
+            frame_info.pop('tator_frame', None)
             frame_info['state'] = None
             frame_info['localizations'] = []
             media_info['frames'][frame_number] = frame_info
@@ -107,8 +108,6 @@ media_keys = list(media_map.keys())
 print(media_map[media_keys[0]].keys())
 print(media_map[media_keys[0]]['frames'][0])
 
-with open('configs/ls_config.isiis.json') as f:
-    ls_config = json.load(f)
 
 with open('configs/tator.json') as f:
     tator_api_kwargs = json.load(f)
@@ -126,8 +125,8 @@ for version in tqdm(versions, desc='versions'):
         continue  # this one has ClassStrCorrection issues
     elif version.id == 25:
         continue  # this one has state training-x-holdout issue
-    elif version.id in [22, 27, 24]:
-        continue # it's been done!
+    # elif version.id in [22, 27, 24]:
+    #     continue # it's been done!
 
     version_content = collate_version(media_map, tator_api, TATOR_PROJECT_ID, version_id=version.id)
 

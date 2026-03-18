@@ -66,12 +66,6 @@ def setup(api, PROJECT_ID, s3key_pattern):
 
 
 if __name__ == '__main__':
-    with open('configs/s3_config.amplify.json') as f:
-        s3_config = json.load(f)
-
-    with open('configs/ls_config.isiis.json') as f:
-        ls_config = json.load(f)
-
     with open('configs/tator.json') as f:
         tator_api_kwargs = json.load(f)
     tator_api = tator.get_api(**tator_api_kwargs)

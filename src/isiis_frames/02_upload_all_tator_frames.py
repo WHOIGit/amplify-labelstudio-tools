@@ -10,7 +10,7 @@ import tator
 from PIL import Image
 from tqdm import tqdm
 
-from utils_s3 import s3_client_and_bucket, s3_url_to_bucket_and_key, s3_list_objects, s3key_exists
+from labelstudio_tools.utils import s3_client_and_bucket, s3_url_to_bucket_and_key, s3_list_objects, s3_read_config
 
 def frame_to_s3(api, media_id, frame, s3_client, s3_key, bucket: Union[str,object]=None, skip_extant:Union[bool,list,set]=True):
     # if s3key_exists(s3_client, s3_key, bucket):
@@ -33,13 +33,12 @@ def frame_to_s3(api, media_id, frame, s3_client, s3_key, bucket: Union[str,objec
         bucket = s3_client.Bucket(bucket)
 
     if skip_extant is True:
-        try: bucket.Object(s3_key).load()
+        try:
+            bucket.Object(s3_key).load()
+            return None  # object exists, skip
         except botocore.exceptions.ClientError as e:
-            code = e.response["Error"]["Code"]
-            if code in ("404", "NoSuchKey"):
-                return None
-            else:
-                raise e
+            if e.response["Error"]["Code"] not in ("404", "NoSuchKey"):
+                raise
     elif isinstance(skip_extant,(list,set)) and s3_key in skip_extant:
         return None
 
@@ -58,12 +57,13 @@ def frame_to_s3(api, media_id, frame, s3_client, s3_key, bucket: Union[str,objec
     return s3_key
 
 
-# TODO THIS FUNCTION IS UNTESTED
 def transfer_frames_parallel(frames, submit_fn, *, max_workers=64, max_in_flight=256):
     from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 
     it = iter(frames)
     in_flight = set()
+    upload_count = 0
+    skip_count = 0
 
     with ThreadPoolExecutor(max_workers=max_workers) as ex, \
          tqdm(total=len(frames), desc="Uploading", dynamic_ncols=True) as pbar:
@@ -81,8 +81,12 @@ def transfer_frames_parallel(frames, submit_fn, *, max_workers=64, max_in_flight
             done, in_flight = wait(in_flight, return_when=FIRST_COMPLETED)
 
             for fut in done:
-                fut.result()          # raises if failed
+                result = fut.result()  # raises if failed
+                if result: upload_count += 1
+                else: skip_count += 1
                 pbar.update(1)
+                if pbar.n % 100 == 0:
+                    pbar.set_postfix(uploaded=upload_count, skipped=skip_count)
 
                 # replace completed future with a new one (if any remain)
                 try:
@@ -91,12 +95,23 @@ def transfer_frames_parallel(frames, submit_fn, *, max_workers=64, max_in_flight
                     continue
                 in_flight.add(ex.submit(submit_fn, frame))
 
+    return upload_count, skip_count
 
-def transfer_frames(tator_api, s3_client, frames, bucket_name='amplify', skip_extant:Literal[True,'PRELOAD']=True, parallel=False):
+
+def transfer_frames(tator_api, s3_client, frames, bucket_name='amplify', skip_extant:Literal[True,'PRELOAD']=True, parallel=False, skiplist_cache='cache/s3_skiplist.pkl'):
 
     if skip_extant=='PRELOAD':
-        print('loading skiplist from s3')
-        skip_extant = set(s3_list_objects(s3_config, bucket_name, prefix='labelstudio/isiis/frames_jpg/'))
+        if skiplist_cache and os.path.exists(skiplist_cache):
+            print(f'loading skiplist from cache: {skiplist_cache}')
+            with open(skiplist_cache, 'rb') as f:
+                skip_extant = pickle.load(f)
+        else:
+            print('loading skiplist from s3')
+            skip_extant = set(s3_list_objects(s3_client, bucket_name, prefix='labelstudio/isiis/frames_jpg/'))
+            if skiplist_cache:
+                with open(skiplist_cache, 'wb') as f:
+                    pickle.dump(skip_extant, f)
+                print(f'saved skiplist cache: {skiplist_cache}')
         print(f'{len(skip_extant)} keys in skiplist')
 
     upload_count = 0
@@ -113,10 +128,12 @@ def transfer_frames(tator_api, s3_client, frames, bucket_name='amplify', skip_ex
     else:
         def submit_fn(frame):
             return frame_to_s3(tator_api, frame['tator_media_id'], frame['tator_frame'], s3_client, frame['image'], bucket_name, skip_extant)
-        transfer_frames_parallel(frames, submit_fn, max_workers=16, max_in_flight=256)
+        upload_count, skip_count = transfer_frames_parallel(frames, submit_fn, max_workers=8, max_in_flight=256)
+
+    print(f'Done. uploaded={upload_count}, skipped={skip_count}')
 
 
-def yolozone_frame_filter(media_map, results_csv):
+def yolozone_frame_filter(media_map, results_csv, include_all_media_frames=None):
     import csv
     from collections import defaultdict
 
@@ -139,7 +156,10 @@ def yolozone_frame_filter(media_map, results_csv):
             missing_media.append(media_name)
             continue
         media_entry = media_map[name_to_id[media_name]]
-        frames = [frame_dict for frame_tator_id, frame_dict in media_entry['frames'].items() if frame_tator_id in frames_numbers]
+        if include_all_media_frames:
+            frames = list(media_entry['frames'].values())
+        else:
+            frames = [frame_dict for frame_tator_id, frame_dict in media_entry['frames'].items() if frame_tator_id in frames_numbers]
         keep_frames.extend(frames)
 
     return keep_frames, missing_media
@@ -147,8 +167,7 @@ def yolozone_frame_filter(media_map, results_csv):
 
 
 if __name__ == '__main__':
-    with open('configs/s3_config.amplify.json') as f:
-        s3_config = json.load(f)
+    s3_config = s3_read_config('configs/s3_config.amplify.json')
     s3_client, bucket = s3_client_and_bucket(s3_config)
 
     with open('configs/tator.json') as f:
@@ -162,9 +181,10 @@ if __name__ == '__main__':
     # for m in media_map.values():
     #     frames.extend(m['frames'].values())
 
-    frames, media_not_in_tator = yolozone_frame_filter(media_map, 'cache/AR88_yolo_concatenated_results.csv')
+    external_model_results_csv = 'cache/AR88_yolo_concatenated_results.csv'
+    frames, media_not_in_tator = yolozone_frame_filter(media_map, external_model_results_csv, include_all_media_frames=True)
 
-    transfer_frames(tator_api, s3_client, frames, skip_extant=True, parallel=False)
+    transfer_frames(tator_api, s3_client, frames, skip_extant='PRELOAD', parallel=True)
     print(media_not_in_tator)
 
     # TATOR_PROJECT_ID = 1
