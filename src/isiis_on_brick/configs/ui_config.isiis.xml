@@ -1,0 +1,91 @@
+<View>
+
+  <View style="display:flex; align-items:center; gap:8px;">
+    <Header value="Cruise:" style="margin:0;" />
+    <Text name="cruise" value="$cruise"></Text>
+  </View>
+  <View style="display:flex; align-items:center; gap:8px;">
+    <Header value="Media:" style="margin:0;" />
+    <Text name="media_name" value="$media"/>
+  </View>
+  <View style="display:flex; align-items:center; gap:8px;">
+    <Header value="Frame:" style="margin:0;" />
+    <Text name="frame_number" value="$frame"/>
+  </View>
+
+  <!-- Draw rectangle -->
+  <Rectangle name="roi" toName="image"/>
+
+  <Image name="image" value="$image"/>
+
+  <Header value="Frame Attributes" size="8"/>
+  <Choices name="frame_dataset"
+           toName="image"
+           showInline="true"
+           choice="single">
+    <Choice value="training"/>
+    <Choice value="holdout"/>
+  </Choices>
+
+  <Choices name="frame_booleans"
+           toName="image"
+           showInline="true"
+           choice="multiple">
+      <Choice value="frame-verified"/>
+      <Choice value="frame-checkme"/>
+    </Choices>
+
+  <TextArea
+      name="frame_note"
+      toName="image"
+      rows="1"
+      showSubmitButton="false"
+      maxSubmissions="1"
+      placeholder="Frame note here..."
+      editable="true"
+      required="false"/>
+
+  <!-- LOCALIZATIONS -->
+  <View visibleWhen="region-selected">
+    <Header value="ROI Attributes" size="8"/>
+  </View>
+
+  <View visibleWhen="region-selected"
+        style="display:flex; align-items:center; gap:8px;">
+    <Header value="Class:" style="margin:0;" />
+    <Taxonomy
+        name="roi_class"
+        toName="image"
+        perRegion="true"
+        maxUsages="1"
+        placeholder="Type or Select ROI Class name..."
+        leafsOnly="false"
+        maxWidth="400px" minWidth="400px"
+        apiUrl="s3://amplify/labelstudio/isiis/classes.Taxonomy.json">
+    </Taxonomy>
+  </View>
+
+  <Choices name="roi_booleans"
+           toName="image"
+           perRegion="true"
+           showInline="true"
+           choice="multiple">
+      <Choice value="roi-verified"/>
+      <Choice value="roi-checkme"/>
+    </Choices>
+
+  <View visibleWhen="region-selected">
+    <Header value="ROI Note"/>
+  </View>
+  <TextArea
+      name="roi_note"
+      toName="image"
+      perRegion="true"
+      rows="1"
+      showSubmitButton="false"
+      maxSubmissions="1"
+      placeholder="ROI note here..."
+      editable="true"
+      required="false"/>
+
+</View>

@@ -1,0 +1,5 @@
+The brick instance of LS is on a subpath, and some endpoints dont work on a subpath, eg resetting the legacy token at https://brick.whoi.edu/labelstudio/user/account/legacy-token
+
+the work around is: open networking tab, hit reset, see the failed request. Right-click->copy->Copy as cURL
+Then paste result in a terminal and change path to include subpath.
+

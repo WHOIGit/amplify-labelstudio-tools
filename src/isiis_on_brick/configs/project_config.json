@@ -1,0 +1,13 @@
+{
+  "project": {
+    "title": "ISIIS Frames",
+    "label_config": "ui_config.isiis.xml",
+    "description": "ISIIS plankton frame annotation project"
+  },
+  "storage": {
+    "type": "s3",
+    "config_file": "s3_config.amplify.json",
+    "presign_ttl": 60,
+    "regex_filter": "(?!)"
+  }
+}
