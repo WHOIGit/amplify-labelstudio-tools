@@ -8,14 +8,14 @@ import httpx
 from tqdm import tqdm
 
 from task_class import IsiisTask
-from labelstudio_tools import LabelStudioPlus
+from labelstudio_tools import TaskManager
 
 TASKSCACHEDIR = 'cache/tasks'
 
 jsonl_files = sorted(glob.glob(os.path.join(TASKSCACHEDIR, '*_tasks.jsonl')))
 print(f'found {len(jsonl_files)} task files in {TASKSCACHEDIR}/')
 
-lsp = LabelStudioPlus.from_config('configs/ls_config.isiis.json')
+tm = TaskManager.from_config('configs/ls_config.isiis.BRICK.json')
 
 total_exists = 0
 total_created = 0
@@ -29,12 +29,12 @@ for filepath in tqdm(jsonl_files, desc='media files'):
         'conjunction': 'or',
         'items': [{'filter': 'filter:tasks:data.media', 'operator': 'equal', 'value': m, 'type': 'String'} for m in medias],
     }
-    lsp.cached_tasks = lsp.get_tasks(filter_dict=media_filter, limit_fields_to=['id', 'data'])
-    lsp.cached_tasks_timestamp = dt.datetime.now()
+    tm.cached_tasks = tm.get_tasks(filter_dict=media_filter, limit_fields_to=['id', 'data'])
+    tm.cached_tasks_timestamp = dt.datetime.now()
 
     for attempt in range(1, 12):
         try:
-            report, import_tasks_responses = lsp.create_tasks(tasks_as_ls_dicts, pk_datafields='image', dry_run=False, force_recache=False)
+            report, import_tasks_responses = tm.create_tasks(tasks_as_ls_dicts, pk_datafields='image', dry_run=False, force_recache=False)
             break
         except httpx.ReadTimeout:
             if attempt == 11:

@@ -6,7 +6,7 @@
   </View>
   <View style="display:flex; align-items:center; gap:8px;">
     <Header value="Media:" style="margin:0;" />
-    <Text name="media_name" value="$media_name"/>
+    <Text name="media_name" value="$media"/>
   </View>
   <View style="display:flex; align-items:center; gap:8px;">
     <Header value="Frame:" style="margin:0;" />
@@ -14,9 +14,7 @@
   </View>
 
   <!-- Draw rectangle -->
-  <RectangleLabels name="roi" toName="image">
-    <Label value="ROI" background="#ff0000"/>
-  </RectangleLabels>
+  <Rectangle name="roi" toName="image"/>
 
   <Image name="image" value="$image"/>
 
